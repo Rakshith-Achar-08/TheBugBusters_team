@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Institution Ledger - Transparency</title>
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --accent: #5b21b6;
+    --muted: #6b7280;
+  }
+  body {margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#111;}
+  header{padding:16px;background:var(--card);display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+  header h1{margin:0;font-size:18px;color:var(--accent);}
+  .container{max-width:1200px;margin:20px auto;padding:12px;display:grid;grid-template-columns:350px 1fr;gap:16px;}
+  .card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05);}
+  label{display:block;margin-top:8px;font-size:13px;color:var(--muted);}
+  input, select, textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;margin-top:4px;font-size:14px;}
+  button{padding:8px 12px;border:none;border-radius:6px;background:var(--accent);color:white;cursor:pointer;margin-top:10px;}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(91,33,182,0.2);}
+  table{width:100%;border-collapse:collapse;margin-top:12px;}
+  th, td{padding:8px;border-bottom:1px solid #eee;text-align:left;font-size:13px;}
+  th{color:var(--muted);}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .node{padding:6px 10px;background:#f0f0ff;border-radius:8px;font-size:13px;border:1px dashed #ccc;}
+  @media(max-width:900px){.container{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Institution Ledger</h1>
+  <button id="exportJSON">Export JSON</button>
+</header>
+
+<div class="container">
+
+  <!-- LEFT PANEL: Budgets -->
+  <div class="card">
+    <h3>Budgets</h3>
+    <label>Budget Name</label>
+    <input id="budgetName" placeholder="Enter budget name">
+    <label>Amount (₹)</label>
+    <input id="budgetAmount" type="number" placeholder="100000">
+    <label>Notes</label>
+    <textarea id="budgetNotes" rows="2" placeholder="Reason or description"></textarea>
+    <button id="createBudget">Create Budget</button>
+
+    <div style="margin-top:16px;">
+      <h4>Available Budgets</h4>
+      <div id="budgetsList"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: Transactions -->
+  <div class="card">
+    <h3>Transactions</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <select id="selectBudget"></select>
+      <input type="text" id="searchInput" placeholder="Search by dept/project/vendor">
+      <select id="sortSelect">
+        <option value="dateAsc">Date ↑</option>
+        <option value="dateDesc">Date ↓</option>
+        <option value="amountAsc">Amount ↑</option>
+        <option value="amountDesc">Amount ↓</option>
+      </select>
+      <button id="addTxBtn">Add Transaction</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th><th>From</th><th>To</th><th>Project</th><th>Vendor</th><th>Amount</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="ledgerTbody"></tbody>
+    </table>
+
+    <div>
+      <h4>Flow View</h4>
+      <div id="flowView" class="flow"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // ---- Data Store ----
+  let store = {
+    budgets: [],
+    transactions: []
+  };
+
+  function uid(prefix='id'){return prefix+Math.random().toString(36).substr(2,9);}
+  function saveStore(){localStorage.setItem('ledger_store', JSON.stringify(store));}
+  function loadStore(){const s=localStorage.getItem('ledger_store');if(s) store=JSON.parse(s);}
+  loadStore();
+
+  // ---- UI Elements ----
+  const budgetsListEl = document.getElementById('budgetsList');
+  const selectBudgetEl = document.getElementById('selectBudget');
+  const ledgerTbody = document.getElementById('ledgerTbody');
+  const flowView = document.getElementById('flowView');
+
+  function renderBudgets(){
+    budgetsListEl.innerHTML='';
+    selectBudgetEl.innerHTML='';
+    store.budgets.forEach(b=>{
+      const div = document.createElement('div');
+      div.style.marginBottom='6px';
+      div.innerHTML=`<strong>${b.name}</strong> - ₹${b.amount} <button onclick="selectBudget('${b.id}')">Select</button>`;
+      budgetsListEl.appendChild(div);
+      const opt=document.createElement('option'); opt.value=b.id; opt.textContent=b.name; selectBudgetEl.appendChild(opt);
+    });
+  }
+
+  function renderLedger(){
+    ledgerTbody.innerHTML='';
+    const budgetId = selectBudgetEl.value || (store.budgets[0] && store.budgets[0].id);
+    if(!budgetId) return;
+
+    let txs = store.transactions.filter(t=>t.budgetId===budgetId);
+
+    // Search filter
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    if(term) txs = txs.filter(t=>
+      t.to.toLowerCase().includes(term) || 
+      (t.project&&t.project.toLowerCase().includes(term)) || 
+      (t.vendor&&t.vendor.toLowerCase().includes(term))
+    );
+
+    // Sorting
+    const sort = document.getElementById('sortSelect').value;
+    txs.sort((a,b)=>{
+      if(sort==='dateAsc') return new Date(a.date)-new Date(b.date);
+      if(sort==='dateDesc') return new Date(b.date)-new Date(a.date);
+      if(sort==='amountAsc') return a.amount-b.amount;
+      if(sort==='amountDesc') return b.amount-a.amount;
+      return 0;
+    });
+
+    txs.forEach(t=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${t.date}</td><td>${t.from}</td><td>${t.to}</td><td>${t.project||'-'}</td><td>${t.vendor||'-'}</td><td>₹${t.amount}</td>
+      <td><button onclick="deleteTx('${t.id}')">Delete</button></td>`;
+      ledgerTbody.appendChild(tr);
+    });
+
+    renderFlow(budgetId, txs);
+  }
+
+  function renderFlow(budgetId, txs){
+    flowView.innerHTML='';
+    if(!txs) return;
+    const nodes = new Set();
+    txs.forEach(t=>{nodes.add(t.from); nodes.add(t.to); if(t.project) nodes.add(t.project); if(t.vendor) nodes.add(t.vendor)});
+    nodes.forEach(n=>{
+      const div=document.createElement('div'); div.className='node'; div.textContent=n; flowView.appendChild(div);
+    });
+  }
+
+  // ---- Actions ----
+  document.getElementById('createBudget').onclick=()=>{
+    const name=document.getElementById('budgetName').value.trim();
+    const amount=Number(document.getElementById('budgetAmount').value);
+    if(!name||!amount) return alert('Enter budget name & amount');
+    const b={id:uid('b'),name,amount};
+    store.budgets.push(b); saveStore(); renderBudgets(); selectBudget(b.id);
+  };
+
+  function selectBudget(id){selectBudgetEl.value=id; renderLedger();}
+
+  document.getElementById('addTxBtn').onclick=()=>{
+    const budgetId=selectBudgetEl.value; if(!budgetId) return alert('Select budget');
+    const date=prompt('Date (YYYY-MM-DD)', new Date().toISOString().slice(0,10));
+    const from=prompt('From (Source)'); const to=prompt('To (Department)');
+    const project=prompt('Project (optional)'); const vendor=prompt('Vendor (optional)');
+    const amount=Number(prompt('Amount ₹'));
+    if(!date||!from||!to||!amount) return alert('Provide required fields');
+    store.transactions.push({id:uid('t'),budgetId,date,from,to,project,vendor,amount});
+    saveStore(); renderLedger();
+  };
+
+  function deleteTx(id){if(confirm('Delete transaction?')){store.transactions=store.transactions.filter(t=>t.id!==id); saveStore(); renderLedger();}}
+
+  document.getElementById('searchInput').oninput=renderLedger;
+  document.getElementById('sortSelect').onchange=renderLedger;
+  document.getElementById('selectBudget').onchange=renderLedger;
+
+  document.getElementById('exportJSON').onclick=()=>{
+    const blob = new Blob([JSON.stringify(store,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='ledger.json'; a.click(); URL.revokeObjectURL(url);
+  };
+
+  renderBudgets(); renderLedger();
+</script>
+
+</body>
+</html>
