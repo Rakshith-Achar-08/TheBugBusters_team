@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Institution Ledger</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <h1>Institution Ledger</h1>
+  </header>
+
+  <!-- Main Container -->
+  <div class="container">
+
+    <!-- Transactions Card -->
+    <div class="card">
+      <h3>Transactions</h3>
+      <table id="ledgerTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>From</th>
+            <th>To (Department)</th>
+            <th>Project</th>
+            <th>Vendor</th>
+            <th>Amount</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="ledgerTbody"></tbody>
+      </table>
+    </div>
+
+    <!-- ✅ Fund Tracking Chart -->
+    <div class="card">
+      <h3>Fund Tracking</h3>
+      <canvas id="fundChart"></canvas>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="ledger.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let fundChart;
+
+    function renderFundChart(budgetId) {
+      const ctx = document.getElementById('fundChart').getContext('2d');
+
+      // Filter transactions for the selected budget
+      const txs = store.transactions.filter(t => t.budgetId === budgetId);
+
+      // Aggregate funds by Dept → Project → Vendor
+      const categories = {};
+      txs.forEach(t => {
+        const dept = t.to || "Unknown Dept";
+        const project = t.project || "No Project";
+        const vendor = t.vendor || "No Vendor";
+
+        const key = `${dept} / ${project} / ${vendor}`;
+        categories[key] = (categories[key] || 0) + t.amount;
+      });
+
+      const labels = Object.keys(categories);
+      const data = Object.values(categories);
+
+      // Destroy old chart if exists
+      if (fundChart) fundChart.destroy();
+
+      fundChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Fund Distribution",
+            data: data,
+            backgroundColor: [
+              "#5b21b6", "#007bff", "#22c55e", "#eab308", "#ef4444", "#14b8a6"
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let value = context.raw.toLocaleString("en-IN", {
+                    style: "currency", currency: "INR"
+                  });
+                  return `${context.label}: ${value}`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // 🔄 Hook chart into your ledger rendering
+    function renderLedger() {
+      ledgerTbody.innerHTML='';
+      const budgetId = selectBudgetEl.value || (store.budgets[0] && store.budgets[0].id);
+      if(!budgetId) return;
+
+      let txs = store.transactions.filter(t=>t.budgetId===budgetId);
+
+      // render table rows
+      txs.forEach(t=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${t.date}</td><td>${t.from}</td><td>${t.to}</td><td>${t.project||'-'}</td><td>${t.vendor||'-'}</td><td>₹${t.amount}</td>
+        <td><button onclick="deleteTx('${t.id}')">Delete</button></td>`;
+        ledgerTbody.appendChild(tr);
+      });
+
+      // update flow + chart
+      renderFlow(budgetId, txs);
+      renderFundChart(budgetId);
+    }
+  </script>
+</body>
+</html>

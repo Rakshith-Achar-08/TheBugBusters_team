@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Awesome Website</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --dark-color: #333;
+            --light-color: #f4f4f4;
+            --text-color: #555;
+            --container-width: 1100px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #fff;
+        }
+
+        .container {
+            max-width: var(--container-width);
+            margin: auto;
+            overflow: hidden;
+            padding: 0 2rem;
+        }
+
+        h1, h2 {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        p {
+            margin: 0.75rem 0;
+        }
+        .navbar {
+            background: #fff;
+            padding: 1rem 0;
+            border-bottom: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1; /* Keeps it behind all content */
+        }
+
+        .video-background video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Makes sure it fills the screen */
+        }
+
+
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            text-decoration: none;
+        }
+
+        .navbar nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        .navbar nav li {
+            margin-left: 20px;
+        }
+
+        .navbar nav a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .navbar nav a:hover {
+            color: var(--primary-color);
+        }
+        .hero {
+            background: var(--light-color);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: #fff;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+        .features {
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-item {
+            background: #fff;
+            padding: 2rem;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .feature-item i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .feature-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .footer {
+            background: var(--cream-color);
+            color: #fff;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        @media(max-width: 768px) {
+            .navbar .container {
+                flex-direction: column;
+            }
+
+            .navbar nav ul {
+                margin-top: 1rem;
+                padding: 0;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .small{
+            font-size: 10px;
+            transition-duration: 0.1s;
+            text-decoration: none;
+        }
+        .small:hover{
+            color: purple;
+            transition-duration: 0.1s;
+        }
+
+    </style>
+</head>
+<body>
+    
+    <div class="video-background">
+        <video autoplay muted loop playsinline>
+            <source src="0913.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    <header class="navbar">
+        <div class="container">
+            <a href="#" class="logo">GlassFund</a>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#about">Sign-In</a></li>
+                    <li><a href="#contact">Sign-Up</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Welcome to GlassFund</h1>
+            <p>“Empowering institutions with trust, accountability, and transparent financial flow.”</p>
+            <a href="#features" class="btn">Learn More</a>
+        </div>
+    </section>
+
+    <main>
+        <section class="features" id="features">
+            <div class="container">
+                <h2>Our Features</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <h3>🔎 Easy Fund Tracking</h3>
+                        <p>Clearly showing how budgets divide across departments, projects, and vendors to make fund movement easy to follow and understand.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>👍 Easily Understandable</h3>
+                        <p> Transforming complex financial reports into clear, meaningful insights, making information easy to comprehend for all stakeholders, including citizens, students, and parents.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>🕵️ Traceability</h3>
+                        <p> The journey of funds and financial data can be followed, verifying approvals and preventing unapproved changes to build reliability and trust.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" id="contact">
+        <div class="container">
+            <p>&copy; 2025 GlassFund. All Rights Reserved.</p>
+            <a href="#" class="small">Support team @"GlassFund@Gmail.com"</a>
+        </div>
+    </footer>
+
+</body>
+</html>
