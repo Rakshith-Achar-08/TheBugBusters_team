@@ -1,2 +1,2 @@
 # TheBugBusters_team
-This is repo for bit and build hackathon programm by the 'The Bug Busters team'.
+This is repository for Bit N Build hackathon programed by the 'The Bug Busters team'.
