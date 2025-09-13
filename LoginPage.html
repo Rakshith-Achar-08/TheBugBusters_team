@@ -35,7 +35,9 @@
             display: flex;
             align-items: center;
             flex-direction: column;
-            width: 250px;
+            width: 90%;
+            max-width: 500px;
+            min-width: 250px;
             height: max-content;
             padding: 25px;
             border-radius: 25px;
@@ -165,6 +167,91 @@
             transform: scale(0.95);
         }
     </style>
+    <script>
+        // Wait for the page to load
+        document.addEventListener('DOMContentLoaded', function () {
+            // Find your sign-in form (adjust selector if needed)
+            const signInForm = document.querySelector('form') || document.querySelector('.sign-in-form');
+            const signInButton = document.querySelector('button[type="submit"]') || document.querySelector('.sign-in-btn');
+
+            // If there's no form, create event listener for the button directly
+            if (signInButton && !signInForm) {
+                signInButton.addEventListener('click', handleLogin);
+            } else if (signInForm) {
+                signInForm.addEventListener('submit', handleLogin);
+            }
+
+            function handleLogin(event) {
+                event.preventDefault(); // Prevent form from refreshing page
+
+                // Get email and password values (adjust IDs to match your HTML)
+                const emailInput = document.querySelector('input[type="email"]') || document.querySelector('input[placeholder*="Email"]') || document.querySelector('#email');
+                const passwordInput = document.querySelector('input[type="password"]') || document.querySelector('input[placeholder*="Password"]') || document.querySelector('#password');
+
+                if (!emailInput || !passwordInput) {
+                    alert('Could not find email or password fields');
+                    return;
+                }
+
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                // Demo credentials for hackathon
+                const validCredentials = {
+                    'admin@trueflow.com': { password: 'admin123', role: 'administrator', username: 'Admin' },
+                    'admin': { password: 'admin123', role: 'administrator', username: 'Admin' },
+                    'auditor@trueflow.com': { password: 'audit123', role: 'auditor', username: 'Auditor' },
+                    'auditor': { password: 'audit123', role: 'auditor', username: 'Auditor' },
+                    'viewer@trueflow.com': { password: 'view123', role: 'public', username: 'Public Viewer' },
+                    'viewer': { password: 'view123', role: 'public', username: 'Public Viewer' }
+                };
+
+                // Check credentials
+                if (validCredentials[email] && validCredentials[email].password === password) {
+                    // Save user session
+                    const userData = {
+                        username: validCredentials[email].username,
+                        email: email,
+                        role: validCredentials[email].role,
+                        loginTime: new Date().toISOString()
+                    };
+
+                    sessionStorage.setItem('currentUser', JSON.stringify(userData));
+
+                    // Show loading effect (optional)
+                    signInButton.innerHTML = 'Signing In...';
+                    signInButton.disabled = true;
+
+                    // Redirect to dashboard after brief delay
+                    setTimeout(() => {
+                        window.location.href = 'Dashboard.html';
+                    }, 1000);
+
+                } else {
+                    // Invalid credentials
+                    alert('Invalid email or password. Try:\nAdmin: admin / admin123\nViewer: viewer / view123');
+
+                    // Add shake effect to form (optional visual feedback)
+                    const formContainer = document.querySelector('.sign-in-container') || document.querySelector('form');
+                    if (formContainer) {
+                        formContainer.style.animation = 'shake 0.5s';
+                        setTimeout(() => formContainer.style.animation = '', 500);
+                    }
+                }
+            }
+        });
+
+        // Optional: Add shake animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+               @keyframes shake {
+                   0 %, 100 % { transform: translateX(0); }
+            25% {transform: translateX(-5px); }
+               75% {transform: translateX(5px); }
+        }
+               `;
+        document.head.appendChild(style);
+    </script>
 </head>
 
 <body>
