@@ -60,6 +60,22 @@
             justify-content: space-between;
             align-items: center;
         }
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1; /* Keeps it behind all content */
+        }
+
+        .video-background video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Makes sure it fills the screen */
+        }
+
 
         .navbar .logo {
             font-size: 1.5rem;
@@ -158,7 +174,7 @@
         }
 
         .footer {
-            background: var(--dark-color);
+            background: var(--cream-color);
             color: #fff;
             text-align: center;
             padding: 2rem 0;
@@ -195,7 +211,13 @@
     </style>
 </head>
 <body>
-
+    
+    <div class="video-background">
+        <video autoplay muted loop playsinline>
+            <source src="0913.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
     <header class="navbar">
         <div class="container">
             <a href="#" class="logo">GlassFund</a>
