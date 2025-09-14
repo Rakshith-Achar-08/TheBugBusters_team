@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <script src="student.js"></script>
+
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 5px; padding: 10px; }
+        #result { margin-top: 20px; white-space: pre-wrap; background: #f4f4f4; padding: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>Student Fee Management</h1>
+    <button onclick="createStudent()">Create Test Student</button>
+    <button onclick="getStudents()">Get All Students</button>
+    
+    <div id="result"></div>
+
+<script>
+    async function createStudent() {
+        const response = await fetch('http://localhost:3000/api/students', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: 'Test Student',
+                email: 'test@example.com',
+                annualFee: 10000
+            })
+        });
+        const data = await response.json();
+        document.getElementById('result').innerHTML = JSON.stringify(data, null, 2);
+    }
+
+    async function getStudents() {
+        const response = await fetch('http://localhost:3000/api/students');
+        const data = await response.json();
+        document.getElementById('result').innerHTML = JSON.stringify(data, null, 2);
+    }
+</script>
+
+    
+</body>
+</html>
