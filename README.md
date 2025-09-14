@@ -20,12 +20,12 @@ Built with **HTML, CSS, and JavaScript** (no backend required for demo).
 ## 📂 Project Structure
 /project-root
 │
-├── index.html # Homepage (GlassFund landing page)
-├── login.html # Sign-in page
-├── dashboard.html # Admin dashboard page
-├── GlassFund.html # Auditor & Public fund tracking page
-├── styles.css # (Optional) Shared CSS file
-├── 0913.mp4 # Background video for homepage
+├── index.html # Homepage (GlassFund landing page)<br>
+├── login.html # Sign-in page<br>
+├── dashboard.html # Admin dashboard page<br>
+├── GlassFund.html # Auditor & Public fund tracking page<br>
+├── styles.css # (Optional) Shared CSS file<br>
+├── 0913.mp4 # Background video for homepage<br>
 └── README.md # Documentation
 
 ---
