@@ -16,6 +16,21 @@ Built with **HTML, CSS, and JavaScript** (no backend required for demo).
 - 📱 Responsive design with simple navigation  
 
 ---
+Financial transparency is the backbone of trust in institutions. Too often, funds disappear into complex reports, leaving citizens, students, and even auditors in the dark.
+
+GlassFund was built with a simple belief: money flow should be as clear as glass.
+
+Our system empowers:
+
+Administrators to manage funds responsibly,
+
+Auditors to verify without obstacles, and
+
+The Public to see where their contributions truly go.
+
+By combining clarity, accountability, and accessibility, GlassFund transforms financial data into a story of trust.
+
+This isn’t just a project—it’s a step toward corruption-free, transparent governance.
 
 ## 📂 Project Structure
 /project-root
